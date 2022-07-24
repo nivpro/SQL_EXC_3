@@ -1,0 +1,83 @@
+#1.
+
+CREATE TABLE simpsons.simpsonsFamilyTree (
+personId INT NOT NULL,
+personName VARCHAR(7) NOT NULL,
+motherId INT,
+fatherId INT,
+spouseId INT
+);
+
+
+#2.
+
+INSERT INTO simpsons.simpsonsFamilyTree (personId, personName, motherId, fatherId,
+spouseId)
+VALUES
+(1, 'Abraham', NULL, NULL, 2),
+(2, 'Mona', NULL, NULL, 1),
+(3, 'Herb', 2, 1, NULL),
+(4, 'Homer', 2, 1, 5),
+(5, 'Marge', 7, 6, 4),
+(6, 'Clancy', NULL, NULL, 7),
+(7, 'Jackie', NULL, NULL, 6),
+(8, 'Patty', 7, 6, NULL),
+(9, 'Selma', 7, 6, NULL),
+(10, 'Ling', 9, NULL, NULL),
+(11, 'Bart', 5, 4, NULL),
+(12, 'Lisa', 5, 4, NULL),
+(13, 'Maggie', 5, 4, NULL);
+
+
+#3.
+
+SELECT parentsId.personId,
+parentsId.personName,
+motherDetailes.personName as mothersName,
+motherFatherDetailes.personName as grandfatherMotherSideName,
+mothermotherDetailes.personName as grandmotherMotherSideName,
+fatherDetailes.personName as fathersName,
+fatherFatherDetailes.personName as grandfatherFatherSideName,
+fatherMotherDetailes.personName as grandMotherFatherSideName
+FROM
+(SELECT * FROM simpsons.simpsonsFamilyTree WHERE personID = 11) as parentsId
+left join
+(SELECT * FROM simpsons.simpsonsFamilyTree) as motherDetailes
+on parentsId.motherId = motherDetailes.personId
+left join
+(SELECT * FROM simpsons.simpsonsFamilyTree) as motherFatherDetailes
+on motherDetailes.fatherId = motherFatherDetailes.personId
+left join
+(SELECT * FROM simpsons.simpsonsFamilyTree) as motherMotherDetailes
+on motherDetailes.motherId = motherMotherDetailes.personId
+left join
+(SELECT * FROM simpsons.simpsonsFamilyTree) as fatherDetailes
+on parentsId.fatherId = fatherDetailes.personId
+left join
+(SELECT * FROM simpsons.simpsonsFamilyTree) as fatherFatherDetailes
+on fatherDetailes.fatherId = fatherFatherDetailes.personId
+left join
+(SELECT * FROM simpsons.simpsonsFamilyTree) as fatherMotherDetailes
+on fatherDetailes.motherId = fatherMotherDetailes.personId
+;
+
+
+#4.
+
+SELECT secondary.personName as Siblings FROM
+(SELECT * FROM simpsons.simpsonsFamilyTree WHERE personId = 5) main
+left join
+(SELECT * FROM simpsons.simpsonsFamilyTree WHERE personId <> 5) secondary
+on main.motherId = secondary.motherId
+
+
+#5.
+
+CREATE INDEX fasterNames ON simpsons.simpsonsFamilyTree (personName);
+
+#6.
+
+CREATE VIEW differentCustomerFirstNames AS
+SELECT DISTINCT first_name as differentCustomerFirstNames
+FROM sakila.customer;
+
